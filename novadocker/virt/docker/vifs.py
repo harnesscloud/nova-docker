@@ -79,8 +79,6 @@ class DockerGenericVIFDriver(object):
                                           network.get_ovs_interfaceid(vif),
                                           vif['address'],
                                           instance['uuid'])
-            utils.execute('ip', 'link', 'set', 'dev', if_local_name, 
-                          'mtu', 1454, run_as_root=True)
             utils.execute('ip', 'link', 'set', if_local_name, 'up',
                           run_as_root=True)
         except Exception:
@@ -203,6 +201,9 @@ class DockerGenericVIFDriver(object):
                           container_id, run_as_root=True)
             utils.execute('ip', 'netns', 'exec', container_id, 'ip', 'link',
                           'set', if_remote_name, 'address', vif['address'],
+                          run_as_root=True)
+            utils.execute('ip', 'netns', 'exec', container_id, 'ip', 'link',
+                          'set','dev', if_remote_name, 'mtu', 1454,
                           run_as_root=True)
             utils.execute('ip', 'netns', 'exec', container_id, 'ifconfig',
                           if_remote_name, ip, run_as_root=True)
