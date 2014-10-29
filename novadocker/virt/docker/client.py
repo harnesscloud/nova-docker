@@ -171,7 +171,7 @@ class DockerHTTPClient(object):
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body='{}')
+            body='{"Privileged" : true}')
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
