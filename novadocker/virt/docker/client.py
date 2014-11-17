@@ -168,10 +168,14 @@ class DockerHTTPClient(object):
                 return v
 
     def start_container(self, container_id):
+        import os
+        body = {'Privileged' : 'true'}
+        if os.path.exists('/dev/infiniband'):
+            body['Volumes'] = { '/dev/infiniband:/dev/infiniband' : {} } 
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body='{"Privileged" : true}')
+            body=repr(body))
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
