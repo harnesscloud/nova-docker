@@ -151,7 +151,7 @@ class DockerHTTPClient(object):
             'Cmd': [],
             'Dns': None,
             'Image': None,
-            'Volumes': {},
+            'Volumes': { '/dev/infiniband' : {} },
             'VolumesFrom': '',
         }
         data.update(args)
@@ -169,13 +169,10 @@ class DockerHTTPClient(object):
 
     def start_container(self, container_id):
         import os
-        body = {'Privileged' : 'true'}
-        if os.path.exists('/dev/infiniband'):
-            body['Volumes'] = { '/dev/infiniband:/dev/infiniband' : {} } 
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body=repr(body))
+            body='{"Privileged" : true, "Binds": ["/dev/infiniband:/dev/infiniband:rw"] }')
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
