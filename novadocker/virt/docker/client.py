@@ -14,6 +14,7 @@
 #    under the License.
 
 import functools
+import os
 import socket
 import urllib
 
@@ -151,9 +152,13 @@ class DockerHTTPClient(object):
             'Cmd': [],
             'Dns': None,
             'Image': None,
-            'Volumes': { '/dev/infiniband' : {} },
+            'Volumes': {},
             'VolumesFrom': '',
         }
+
+        if os.path.exists('/dev/infiniband'):
+            data['Volumes'] = {'/dev/infiniband': {}}
+
         data.update(args)
         resp = self.make_request(
             'POST',
@@ -168,11 +173,17 @@ class DockerHTTPClient(object):
                 return v
 
     def start_container(self, container_id):
-        import os
+
+        if os.path.exists('/dev/infiniband'):
+            body = '{"Privileged" : true, ' +\
+                   '"Binds": ["/dev/infiniband:/dev/infiniband:rw"]}'
+        else:
+            body = '{"Privileged" : true}'
+
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body='{"Privileged" : true, "Binds": ["/dev/infiniband:/dev/infiniband:rw"] }')
+            body=body)
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
