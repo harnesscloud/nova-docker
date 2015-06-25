@@ -153,7 +153,6 @@ class DockerHTTPClient(object):
             'Dns': None,
             'Image': None,
             'Volumes': {},
-            'VolumesFrom': '',
         }
 
         if os.path.exists('/dev/infiniband'):
