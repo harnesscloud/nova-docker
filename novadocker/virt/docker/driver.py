@@ -145,7 +145,7 @@ class DockerDriver(driver.ComputeDriver):
         if not container:
             raise exception.InstanceNotFound(instance_id=instance['name'])
         running = container['State'].get('Running')
-        mem = container['Config'].get('Memory', 0)
+        mem = container['Config'].get('HostConfig', {}).get('Memory', 0)
 
         # NOTE(ewindisch): cgroups/lxc defaults to 1024 multiplier.
         #                  see: _get_cpu_shares for further explaination
@@ -279,9 +279,11 @@ class DockerDriver(driver.ComputeDriver):
         args = {
             'Hostname': instance['name'],
             'Image': image_name,
-            'Memory': self._get_memory_limit_bytes(instance),
-            'CpuShares': self._get_cpu_shares(instance),
             'NetworkDisabled': False,
+            'HostConfig': {
+                'Memory': self._get_memory_limit_bytes(instance),
+                'CpuShares': self._get_cpu_shares(instance),
+            }
         }
 
         image = self.docker.inspect_image(image_name)

@@ -139,18 +139,14 @@ class DockerHTTPClient(object):
         data = {
             'Hostname': '',
             'User': '',
-            'Memory': 0,
-            'MemorySwap': 0,
             'AttachStdin': False,
             'AttachStdout': False,
             'AttachStderr': False,
-            'PortSpecs': [],
             'Tty': True,
             'OpenStdin': True,
             'StdinOnce': False,
             'Env': None,
             'Cmd': [],
-            'Dns': None,
             'Image': None,
             'Volumes': {},
         }
@@ -171,18 +167,18 @@ class DockerHTTPClient(object):
             if k.lower() == 'id':
                 return v
 
-    def start_container(self, container_id):
+    def start_container(self, args, container_id):
+        data = {
+            'Privileged': True,
+        }
 
         if os.path.exists('/dev/infiniband'):
-            body = '{"Privileged" : true, ' +\
-                   '"Binds": ["/dev/infiniband:/dev/infiniband:rw"]}'
-        else:
-            body = '{"Privileged" : true}'
+            data['Binds'] = ["/dev/infiniband:/dev/infiniband:rw"]
 
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body=body)
+            body=jsonutils.dumps(data))
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
