@@ -167,7 +167,7 @@ class DockerHTTPClient(object):
             if k.lower() == 'id':
                 return v
 
-    def start_container(self, args, container_id):
+    def start_container(self, container_id):
         data = {
             'Privileged': True,
         }
