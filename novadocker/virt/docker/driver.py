@@ -276,27 +276,27 @@ class DockerDriver(driver.ComputeDriver):
     def spawn(self, context, instance, image_meta, injected_files,
               admin_password, network_info=None, block_device_info=None):
         image_name = self._get_image_name(context, instance, image_meta)
-        args = {
+        config = {
             'Hostname': instance['name'],
             'Image': image_name,
             'NetworkDisabled': False,
-            'HostConfig': {
-                'Memory': self._get_memory_limit_bytes(instance),
-                'CpuShares': self._get_cpu_shares(instance),
-            }
+        }
+        hostconfig = {
+            'Memory': self._get_memory_limit_bytes(instance),
+            'CpuShares': self._get_cpu_shares(instance),
         }
 
         image = self.docker.inspect_image(image_name)
         if not image:
             image = self._pull_missing_image(context, image_meta, instance)
         if not (image and image['ContainerConfig']['Cmd']):
-            args['Cmd'] = ['sh']
+            config['Cmd'] = ['sh']
         # Glance command-line overrides any set in the Docker image
         if (image_meta and
                 image_meta.get('properties', {}).get('os_command_line')):
-            args['Cmd'] = image_meta['properties'].get('os_command_line')
+            config['Cmd'] = image_meta['properties'].get('os_command_line')
 
-        container_id = self._create_container(instance, args)
+        container_id = self._create_container(instance, config, hostconfig)
         if not container_id:
             raise exception.InstanceDeployFailure(
                 _('Cannot create container'),

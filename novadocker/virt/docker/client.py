@@ -135,10 +135,9 @@ class DockerHTTPClient(object):
             return []
         return resp.to_json(default=[])
 
-    def create_container(self, args, name):
+    def create_container(self, config, hostconfig, name):
+
         data = {
-            'Hostname': '',
-            'User': '',
             'AttachStdin': False,
             'AttachStdout': False,
             'AttachStderr': False,
@@ -154,7 +153,18 @@ class DockerHTTPClient(object):
         if os.path.exists('/dev/infiniband'):
             data['Volumes'] = {'/dev/infiniband': {}}
 
-        data.update(args)
+        data.update(config)
+
+        data['HostConfig'] = {
+            'Privileged': True,
+        }
+
+        data['HostConfig'].update(hostconfig)
+
+        if os.path.exists('/dev/infiniband'):
+            data['HostConfig']['Binds'] = [
+                "/dev/infiniband:/dev/infiniband:rw"]
+
         resp = self.make_request(
             'POST',
             'containers/create',
@@ -168,17 +178,11 @@ class DockerHTTPClient(object):
                 return v
 
     def start_container(self, container_id):
-        data = {
-            'Privileged': True,
-        }
-
-        if os.path.exists('/dev/infiniband'):
-            data['Binds'] = ["/dev/infiniband:/dev/infiniband:rw"]
 
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body=jsonutils.dumps(data))
+            body=None)
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
