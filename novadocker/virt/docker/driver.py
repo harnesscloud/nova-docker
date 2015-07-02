@@ -475,9 +475,9 @@ class DockerDriver(driver.ComputeDriver):
         flavor = flavors.extract_flavor(instance)
         return int(flavor['vcpus']) * 1024
 
-    def _create_container(self, instance, args):
+    def _create_container(self, instance, config, hostconfig):
         name = "nova-" + instance['uuid']
-        return self.docker.create_container(args, name)
+        return self.docker.create_container(config, hostconfig, name)
 
     def get_host_uptime(self, host):
         return hostutils.sys_uptime()
