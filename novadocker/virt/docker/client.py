@@ -96,7 +96,7 @@ class UnixHTTPConnection(httplib.HTTPConnection):
 
 
 class DockerHTTPClient(object):
-    VERSION = 'v1.13'
+    VERSION = 'v1.19'
 
     def __init__(self, connection=None):
         self._connection = connection
