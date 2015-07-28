@@ -189,14 +189,14 @@ class DockerHTTPClient(object):
         resp = self.make_request(
             'POST',
             'containers/{0}/pause'.format(container_id),
-            body='{}')
+            body=None)
         return (resp.code == 204)
 
     def unpause_container(self, container_id):
         resp = self.make_request(
             'POST',
             'containers/{0}/unpause'.format(container_id),
-            body='{}')
+            body=None)
         return (resp.code == 204)
 
     def inspect_image(self, image_name):

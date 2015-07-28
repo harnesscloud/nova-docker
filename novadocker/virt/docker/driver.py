@@ -279,7 +279,7 @@ class DockerDriver(driver.ComputeDriver):
         config = {
             'Hostname': instance['name'],
             'Image': image_name,
-            'NetworkDisabled': False,
+            'NetworkDisabled': True,
         }
         hostconfig = {
             'Memory': self._get_memory_limit_bytes(instance),
