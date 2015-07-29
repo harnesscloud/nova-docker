@@ -154,7 +154,7 @@ class DockerHTTPClient(object):
 
         data['HostConfig'] = {
             'Memory': 0,
-            'MemorySwap': -1,
+            'MemorySwap': 0,
             'Privileged': True
         }
         data['HostConfig'].update(hostconfig)

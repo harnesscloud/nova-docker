@@ -283,6 +283,7 @@ class DockerDriver(driver.ComputeDriver):
         }
         hostconfig = {
             'Memory': self._get_memory_limit_bytes(instance),
+            'MemorySwap': self._get_memory_limit_bytes(instance),
             'CpuShares': self._get_cpu_shares(instance),
         }
 
