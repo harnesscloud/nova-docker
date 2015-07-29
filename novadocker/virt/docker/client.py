@@ -14,6 +14,7 @@
 #    under the License.
 
 import functools
+import os
 import socket
 import urllib
 
@@ -158,6 +159,11 @@ class DockerHTTPClient(object):
             'Privileged': True
         }
         data['HostConfig'].update(hostconfig)
+
+        if os.path.exists('/dev/infiniband'):
+            data['Volumes']['/dev/infiniband'] = {}
+            data['HostConfig']['Binds'] = [
+                '/dev/infiniband:/dev/infiniband:rw']
 
         resp = self.make_request(
             'POST',
