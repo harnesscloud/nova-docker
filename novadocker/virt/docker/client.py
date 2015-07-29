@@ -134,12 +134,10 @@ class DockerHTTPClient(object):
             return []
         return resp.to_json(default=[])
 
-    def create_container(self, args, name):
+    def create_container(self, config, hostconfig, name):
         data = {
             'Hostname': '',
             'User': '',
-            'Memory': 0,
-            'MemorySwap': 0,
             'AttachStdin': False,
             'AttachStdout': False,
             'AttachStderr': False,
@@ -149,11 +147,18 @@ class DockerHTTPClient(object):
             'StdinOnce': False,
             'Env': None,
             'Cmd': [],
-            'Dns': None,
             'Image': None,
             'Volumes': {},
         }
-        data.update(args)
+        data.update(config)
+
+        data['HostConfig'] = {
+            'Memory': 0,
+            'MemorySwap': -1,
+            'Privileged': True
+        }
+        data['HostConfig'].update(hostconfig)
+
         resp = self.make_request(
             'POST',
             'containers/create',
