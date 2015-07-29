@@ -136,8 +136,9 @@ class DockerHTTPClient(object):
         return resp.to_json(default=[])
 
     def create_container(self, config, hostconfig, name):
-
         data = {
+            'Hostname': '',
+            'User': '',
             'AttachStdin': False,
             'AttachStdout': False,
             'AttachStderr': False,
@@ -149,21 +150,19 @@ class DockerHTTPClient(object):
             'Image': None,
             'Volumes': {},
         }
-
-        if os.path.exists('/dev/infiniband'):
-            data['Volumes'] = {'/dev/infiniband': {}}
-
         data.update(config)
 
         data['HostConfig'] = {
-            'Privileged': True,
+            'Memory': 0,
+            'MemorySwap': -1,
+            'Privileged': True
         }
-
         data['HostConfig'].update(hostconfig)
 
         if os.path.exists('/dev/infiniband'):
+            data['Volumes']['/dev/infiniband'] = {}
             data['HostConfig']['Binds'] = [
-                "/dev/infiniband:/dev/infiniband:rw"]
+                '/dev/infiniband:/dev/infiniband:rw']
 
         resp = self.make_request(
             'POST',
@@ -178,25 +177,24 @@ class DockerHTTPClient(object):
                 return v
 
     def start_container(self, container_id):
-
         resp = self.make_request(
             'POST',
             'containers/{0}/start'.format(container_id),
-            body=None)
+            body='{}')
         return (resp.code == 200 or resp.code == 204)
 
     def pause_container(self, container_id):
         resp = self.make_request(
             'POST',
             'containers/{0}/pause'.format(container_id),
-            body=None)
+            body='{}')
         return (resp.code == 204)
 
     def unpause_container(self, container_id):
         resp = self.make_request(
             'POST',
             'containers/{0}/unpause'.format(container_id),
-            body=None)
+            body='{}')
         return (resp.code == 204)
 
     def inspect_image(self, image_name):
