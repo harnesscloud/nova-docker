@@ -129,7 +129,7 @@ class DockerHTTPClient(object):
     def list_containers(self, _all=True):
         resp = self.make_request(
             'GET',
-            'containers/ps',
+            'containers/json',
             ('all', int(_all)))
         if resp.code == 404:
             return []
