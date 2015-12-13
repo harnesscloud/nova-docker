@@ -95,7 +95,7 @@ class UnixHTTPConnection(httplib.HTTPConnection):
 
 
 class DockerHTTPClient(object):
-    VERSION = 'v1.13'
+    VERSION = 'v1.22'
 
     def __init__(self, connection=None):
         self._connection = connection
@@ -128,33 +128,35 @@ class DockerHTTPClient(object):
     def list_containers(self, _all=True):
         resp = self.make_request(
             'GET',
-            'containers/ps',
+            'containers/json',
             ('all', int(_all)))
         if resp.code == 404:
             return []
         return resp.to_json(default=[])
 
-    def create_container(self, args, name):
+    def create_container(self, config, hostconfig, name):
         data = {
             'Hostname': '',
             'User': '',
-            'Memory': 0,
-            'MemorySwap': 0,
             'AttachStdin': False,
             'AttachStdout': False,
             'AttachStderr': False,
-            'PortSpecs': [],
             'Tty': True,
             'OpenStdin': True,
             'StdinOnce': False,
             'Env': None,
             'Cmd': [],
-            'Dns': None,
             'Image': None,
             'Volumes': {},
-            'VolumesFrom': '',
         }
-        data.update(args)
+        data.update(config)
+
+        data['HostConfig'] = {
+            'Memory': 0,
+            'MemorySwap': 0,
+        }
+        data['HostConfig'].update(hostconfig)
+
         resp = self.make_request(
             'POST',
             'containers/create',
